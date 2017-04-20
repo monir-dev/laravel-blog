@@ -9,6 +9,7 @@ use App\Slideshow;
 use Session;
 use Image;
 use Storage;
+use File;
 
 class SlideshowController extends Controller
 {
@@ -131,12 +132,14 @@ class SlideshowController extends Controller
           $image = $request->file('filePath');
           $filename = time() . '.' . $image->getClientOriginalExtension();
           $location = public_path('images/slideshow/' . $filename);
-          Image::make($image)->resize(800, 400)->save($location);
+          Image::make($image)->resize(1360, 800)->save($location);
           $oldFilename = $slide->filePath;
           // update the database
             $slide->filePath = $filename;
           // Delete the old photo
-          Storage::delete($oldFilename);
+          // Storage::delete($oldFilename);
+          $path = public_path('images/slideshow/'. $oldFilename);
+          File::delete($path);
       }
 
       $slide->save();
@@ -157,7 +160,9 @@ class SlideshowController extends Controller
     public function destroy($id)
     {
       $slide = Slideshow::find($id);
-      Storage::delete($slide->filePath);
+      // Storage::delete($slide->filePath);
+      $path = public_path('images/slideshow/'. $slide->filePath);
+      File::delete($path);
 
       $slide->delete();
 

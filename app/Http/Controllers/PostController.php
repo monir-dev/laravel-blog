@@ -10,6 +10,7 @@ use Session;
 use Purifier;
 use Image;
 use Storage;
+use File;
 
 class PostController extends Controller
 {
@@ -176,7 +177,7 @@ class PostController extends Controller
         $post->category_id = $request->input('category_id');
         $post->body = Purifier::clean($request->input('body'));
 
-        
+
 
         //save our image
         if ($request->hasFile('featured_image')) {
@@ -191,7 +192,9 @@ class PostController extends Controller
           $post->image = $filename;
 
           //delete the old photo
-          Storage::delete($oldFileName);
+          $path = public_path('images/'. $oldFileName);
+          File::delete($path);
+          // Storage::delete($oldFileName);
         }
 
         $post->save();
@@ -224,7 +227,9 @@ class PostController extends Controller
         $post = Post::find($id);
 
         $post->tags()->detach();
-        Storage::delete($post->image);
+        // Storage::delete($post->image);
+        $path = public_path('images/'. $post->image);
+        File::delete($path);
 
         //Delete the post
         $post->delete();
